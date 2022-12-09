@@ -1,0 +1,7 @@
+
+
+(define (rev-all L)
+  (cond ((null? L) '())
+        (else (append (rev-all (cdr L)) (list (car L))))
+   )
+  )

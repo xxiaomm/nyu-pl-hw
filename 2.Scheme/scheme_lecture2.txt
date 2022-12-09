@@ -1,0 +1,282 @@
+Welcome to Racket v7.8.
+R5RS legacy support loaded
+> ;;; car: first element of a list,  cdr: rest of the list
+  ;;;  Since scheme is functional, no function modifies its arguments
+
+(define L '(1 2 3 4))
+> (car L)
+1  
+> L
+(1 2 3 4)
+> ;;; second element of a list
+(car (cdr L))
+2
+> ;; third element
+(car (cdr (cdr L)))
+3
+> ;;; shortcuts:  (cadr L) gives you the second element
+  ;;;             (caddr L) gives you the third element
+  ;;;             (c...r L), where ... is a sequence of a's and d's, gives
+  ;;;                        you an element of the list corresponding to a
+  ;;;                        car for every "a" and a cdr for every "d".
+
+(cadr '(2 4 6 8))
+4
+> ;; What does this return?
+
+(cadadr '((2 3) (4 5 6) (7 8 9)))
+5
+
+> 'L    ;; this is the symbol L, not the variable L, due to the quote.
+l     ;; <--- NOTE: This is a lower-case L, not the number 1. Scheme is case-insensitive.
+> L
+(1 2 3 4)
+> '(if (= 3 4) 5 6)   ;;; the quote says leave this as a list, don't evaluate it.
+(if (= 3 4) 5 6)
+> (car '5)    ;;; this will be an error, since you can't take the CAR of something that is not a list.
+mcar: contract violation
+  expected: mpair?
+  given: 5
+  context...:
+   eval-one-top
+   /Applications/Racket v7.8/collects/racket/repl.rkt:11:26
+   "/Applications/Racket v7.8/share/pkgs/r5rs-lib/r5rs/run.rkt": [running body]
+   temp35_0
+   for-loop
+   run-module-instance!
+   perform-require!
+> 
+
+;;; HOW TO CREATE A LIST?
+
+;;; 1)  Use a quote  '(1 2 4 6 7)
+;;; 2)  Use the LIST function:
+
+(list 3 (+ 4 5) 'hello 19)
+(3 9 hello 19)
+> 
+
+;;; 3) Use the CONS function. (cons x L), where L is a list, returns a new list
+;;;    whose first element is x and whose subsequent elements are the elements
+;;;    of L.
+;;;    That is, the car of the new list is x and the cdr of the new list is L.
+
+(cons 3 '(4 5 6))
+(3 4 5 6)
+> L
+(1 2 3 4)
+> (define newL (cons (* 3 12) L))
+> newL
+(36 1 2 3 4)
+> (car newL)
+36
+> (cdr newL)
+(1 2 3 4)
+> ;;; cons does not modify its arguments, of course:
+L
+(1 2 3 4)
+> ;;; The empty list is written '(). It is pronounced "nil".
+'()
+()
+> ;;; Let's create a list of numbers from N to M
+  ;;; (numsfrom 4 7) => (4 5 6 7)
+  
+  ;;; Recursive thinking:  (numsfrom N M)
+  ;;;   Base Case:  N > M => '()
+  ;;;   Assumption: Assume (numsfrom (+ N 1) M) works
+  ;;;   Step: (cons N (numsfrom (+ N 1) M))
+
+(define (numsfrom N M)
+  (cond ((> N M) '())
+        (else (cons N (numsfrom (+ N 1) M)))))
+> (numsfrom 3 20)
+(3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
+> 
+
+;;; Append creates a list from the elements of two lists
+
+(append '(2 4 6 8) '(1 3 5 7))
+(2 4 6 8 1 3 5 7)
+> ;;; Append is easily written in Scheme
+  ;;; I'll call my version MyAppend, since this implementation doesn't
+  ;;; want me to redefine built-in functions.
+
+  ;;; Recursive thinking:  (append L1 L2)
+0
+0
+>  ;; Base Case:  L1 is empty =>  L2
+   ;; Assumption (append L L2) works for any list L smaller than L1
+   ;; Step:      (cons (car L1) (append (cdr L1) L2))
+
+(define (MyAppend L1 L2)
+  (cond ((null? L1) L2)
+        (else (cons (car L1) (MyAppend (cdr L1) L2)))))
+> (MyAppend '(1 2 3 4) '(5 6 7 8))
+(1 2 3 4 5 6 7 8)
+> ;;; What is the complexity of append? O(n) where n is the length of L1
+
+;;; (reverse L) returns a new list containing the elements of L in reverse order.
+
+(reverse '(1 2 3 4 5))
+(5 4 3 2 1)
+> (reverse '((1 2) (3 4) (5 6)))
+((5 6) (3 4) (1 2))
+> 
+;;; Defining reverse ourselves: (reverse L)
+;;;  Base Case: (null? L)  => '()
+;;;  Assumption:  (reverse (cdr L)) works.
+;;;  Step:  (append (reverse (cdr L)) (list (car L)))
+
+(define (myReverse L)
+  (cond ((null? L) '())
+        (else (append (myReverse (cdr L)) (list (car L))))))
+> (myReverse '((1 2) (3 4) (5 6)))
+((5 6) (3 4) (1 2))
+> ;;; What's the complexity of myReverse? O(n^2) where n is the length of L.
+  ;;; That's because append is being called on lists of size n-1, then n-2, ..
+  ;;; so O((n-1)+(n-2)+...) is O(n^2)
+
+;;; Linear time reverse:  Move the elements from the old list to the new list
+
+;;; (rev old new)
+;;;  Base case: (null? old)  =>  new
+;;;  Assumption:  (rev L M) will work if L is smaller than old
+;;;  Step:  (rev (cdr old) (cons (car old) new))
+
+(define (rev old new)
+  (cond ((null? old) new)
+        (else (rev (cdr old) (cons (car old) new)))))
+> (rev '(1 2 3 4 5) '())
+(5 4 3 2 1)
+> (define (myReverse2 L) (rev L '()))
+> (myReverse2 '(2 4 6 8))
+(8 6 4 2)
+> 
+
+;;; In functional languages, functions are "first class", meaning that they
+;;; are values that can be passed as parameters, returned as results, and put
+;;; into lists.
+
+(define (f g) (g 3))  ;; f takes a parameter g, and calls g on 3.
+> 
+(define (add1 x) (+ 1 x))
+> 
+(f add1)
+4
+> ;;; A function that takes another function as a parameter or returns another
+ ;;;  function as a result is called a "higher order function". 
+
+;;; Example:  (map f L) returns the list resulting from calling f on each
+;;;           element of the list L.
+
+> (map add1 '(2 4 6 8))
+(3 5 7 9)
+> ;;; MAP is easy to write
+
+(define (myMap f L)
+  (cond ((null? L) '())
+        (else (cons (f (car L))  (myMap f (cdr L))))))
+> (myMap add1 '(2 4 6 8))
+(3 5 7 9)
+> ;;; Instead of having to define add1, etc., in order to pass a function
+  ;;; to map, we can define anonymous functions -- functions with no names.
+  ;;; Using LAMBDA:    (lambda (arg1 ... argN) body)
+  ;;;                  represents a function whose formal parameters are
+ ;;;                   arg1 ... argN and whose body is body.
+
+(lambda (x y) (+ x y))   ;;; this evaluates to a function (aka "procedure")
+#<procedure>
+> ((lambda (x y) (+ x y)) 6 8)
+14
+> ;; using Map with lambdas:
+
+(map (lambda (x) (* x 2)) '(1 2 3 4 5))
+(2 4 6 8 10)
+> 
+
+;;; A LET allows us to declare local variables
+;;; (let ((var1 exp1) ... (varN expN)) body)
+
+;;; Evaluates the body in an environment in which the variable var1 has the
+;;; value of exp1,..., varN has the value of expN.
+
+(let ((x (+ 4 3)) (y (* 10 4))) 
+  (+ x y))
+47
+> ;;; exp1 through expN cannot refer to var1 and varN
+
+(let ((a 3) (b (+ a 1)))    ;; the definition of b cannot use the new a.
+  (* a b))
+a: undefined;
+ cannot reference an identifier before its definition
+  in module: top-level
+  context...:
+   eval-one-top
+   /Applications/Racket v7.8/collects/racket/repl.rkt:11:26
+   "/Applications/Racket v7.8/share/pkgs/r5rs-lib/r5rs/run.rkt": [running body]
+   temp35_0
+   for-loop
+   run-module-instance!
+   perform-require!
+> 
+
+(let ((L '(100 200 300)) (y (car L)))   ;;; this is a reference to the outer L
+  y)
+1
+> ;;; Scheme is statically scoped, so a function is evaluated in the environment
+  ;;; of its definition.
+
+(define f (let ((x 100)) (lambda (y) (+ x y))))
+> 
+(f 3)
+103
+> (define x 29)
+> x
+29
+> (f 10)
+110
+> 
+
+;;; For convenience, Scheme provides LET*, which is a LET that introduces
+;;; the variables sequentially, so the value given to a new variable can
+;;; rely on the value of a previous new variable.
+
+(let* ((L 23) (M (+ L 2))) 
+  (+ M 50))
+75
+> ;;; this is equivalent to:
+
+(let ((L 23))
+  (let ((M (+ L 2)))
+    (+ M 50)))
+75
+> 
+
+;;; Neither LET nor LET* can be used to declare variables that are 
+;;; recursive functions.
+
+(let ((fac (lambda (x) (if (= x 0) 1 (* x (fac (- x 1)))))))
+  (fac 5))
+fac: undefined;
+ cannot reference an identifier before its definition
+  in module: top-level
+  context...:
+   eval-one-top
+   /Applications/Racket v7.8/collects/racket/repl.rkt:11:26
+   "/Applications/Racket v7.8/share/pkgs/r5rs-lib/r5rs/run.rkt": [running body]
+   temp35_0
+   for-loop
+   run-module-instance!
+   perform-require!
+> ;;; Use LETREC for this:
+
+(letrec ((fac (lambda (x) (if (= x 0) 1 (* x (fac (- x 1)))))))
+  (fac 5))
+120
+> ;;; can use letrec to define mutually recursive functions
+
+(letrec ((f (lambda (x) (if (= x 0) 1 (* x (g (- x 1))))))
+           (g (lambda (x) (if (= x 0) 1 (* x (f (- x 1)))))))
+      (f 5))
+120
+> 

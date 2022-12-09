@@ -1,0 +1,21 @@
+(define (split x L)
+  (cond ((pair? L) 
+         (cond ((< x (car L)) (cons (car (split x (cdr L)))
+                                    (cons (cons (car L) (cadr (split x (cdr L))) ) '()) )  )
+               ((>= x (car L)) (cons (cons (car L) (car (split x (cdr L))) )
+                                     (cdr (split x (cdr L))) )  )  )  )
+        (else '(()())) )
+  )
+
+
+(define (psort L)
+  (cond ((pair? L) (append (psort (car (split (car L) (cdr L))) )
+                           (cons (car L)(psort (cadr (split (car L) (cdr L))) ) )
+                         )
+                   )
+        (else '())
+        )
+  )
+
+;;(psort '(5 3 8))  (5 3) ()
+;;﻿(psort '(5 3 8 6 1 0 2))

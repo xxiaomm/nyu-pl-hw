@@ -1,0 +1,8 @@
+;;; question 1: byTwo n m
+;;; Base case: if k = n, we will return k
+;;; assumption: assumes (fromTo (+ 1 k) n) returns the list from k+1 to n
+;;; recursive: (from To k n) = (cons k (fromTo (+ 1 k) n))
+
+(define (byTwos n m)
+    (cond ((= n m) (list n))
+    (else (cons n (byTwos (+ 2 n) m)))))

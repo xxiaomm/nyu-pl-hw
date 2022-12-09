@@ -1,0 +1,174 @@
+
+\documentclass[11pt]{article}
+\textheight=9.0in
+\textwidth=6.5in
+\topmargin=-.3in
+\oddsidemargin=-0.2in
+%\evensidemargin=0in
+\itemsep=6pt
+%\parsep=0pt
+%\partopsep=0pt
+
+\newcommand{\ra}{\rightarrow}
+\newcommand{\Lra}{\Leftrightarrow}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\lam}{\lambda}
+
+\begin{document}
+%\pagestyle{empty}
+%\addtolength{\baselineskip}{-.3\baselineskip}
+%\addtolength{\topmargin}{-0.5in}
+
+
+
+\begin{center}
+{\bf
+Programming Languages\\
+
+CSCI-GA.2110.001 Fall 2021 \\
+\vspace{2ex} 
+Homework 2\\
+Due Sunday, December 19 at 11:55pm \\
+\vspace{2ex}
+}
+\end{center}
+
+%\vspace{2ex}
+\noindent
+You should write the answers using word, latex, etc., and upload them
+as a PDF document. {\bf Important: You \underline{must} turn this in
+by 11:55pm on December 19.  I will be posting the solutions shortly after.}
+\vspace{1ex}
+
+\begin{enumerate} 
+\item %ML and polymorphism
+\begin{enumerate} 
+\item In ML, why do all lists have to be homogeneous (i.e. all elements of a list must be of the same type)?
+
+\item Write a function in ML whose type is:
+\begin{verbatim} 
+('a -> 'b list) -> ('b -> 'c list) -> ('c -> 'd) -> 'a -> 'd list
+\end{verbatim}
+  
+
+\item What is the type of the following function (try to answer without running the ML system)?
+\begin{verbatim} 
+fun foo (op <) f g (x,y) z  =  if f(x,y) < g x then z + 1 else z - 1
+\end{verbatim} 
+
+
+\item Provide an intuitive explanation of how the ML type inferencer would infer the type that you gave as the answer to the previous question.
+
+\end{enumerate} 
+
+\item 
+%lambda calculus
+\begin{enumerate} 
+\item In the $\lam$-calculus, give an example of an expression which would reduce to normal form under normal-order evaluation, but not under applicative-order evaluation.
+
+
+\item Write the definition of a recursive function (other than factorial, which I did in class) using the Y combinator.  Show a series of reductions of an expression involving that function which illustrates how it is, in fact, recursive (as I did in class for factorial).
+
+
+
+\item Write the actual expression in the $\lam$-calculus representing the Y combinator, and show that it satisfies the property \mbox{Y(f) $\Lra$ f(Y(f))}.
+
+
+\item 
+Summarize, in your own words, what the two Church-Rosser theorems state.
+
+\end{enumerate} 
+
+\item 
+\begin{enumerate} 
+\item 
+As discussed in class, what are the three features that a language must have in order to considered object oriented?
+
+\item What is the ``subset interpretation of suptyping''?
+
+\item Provide an intuitive answer, and give an example, showing why class derivation in Java satisfies the subset interpretation of subtyping.
+
+
+\item Provide an intuitive answer, and give an example (in code), showing why subtyping of functions, in languages (such as Scala) that allow it, satisfies the subset interpretation of subtyping.
+
+
+\end{enumerate}
+
+\item 
+In Java generics, subtyping on instances of generic classes is invariant.  That is, two different
+instances {\tt C<A>} and {\tt C<B>} of a generic class {\tt C} have no subtyping relationship, 
+regardless of a subtyping relationship between {\tt A} and {\tt B} (unless, of course, A and 
+B are the same class). 
+\begin{enumerate} 
+\item
+Write a function (method) in Java that illustrates why, even if {\tt
+  B} is a subtype of {\tt A}, {\tt C<B>} should not be a subtype of
+{\tt C<A>}.  That is, write some Java code that, if the compiler
+allowed such covariant subtyping among instances of a generic class,
+would result in a run-time type error.
+
+\item 
+Modify the code you wrote for the above question that illustrates how
+Java allows a form of polymorphism among instances of generic classes,
+without allowing subtyping. That is, make the function you wrote 
+above be able to be called with many different instances of a generic class.
+
+\end{enumerate} 
+
+\item 
+\begin{enumerate} 
+\item
+Consider the following Scala definition of a tree type, where each
+node contains a value.
+\begin{verbatim} 
+abstract class Tree[T <: Ordered[T]]
+case class Node[T <: Ordered[T]](v:T, l:Tree[T], r:Tree[T]) extends Tree[T]
+case class Leaf[T <: Ordered[T]](v:T) extends Tree[T]
+\end{verbatim} 
+Ordered is a built-in trait in Scala (see\\ 
+\mbox{\tt http://www.scala-lang.org/api/current/index.html\#scala.math.Ordered}). Write a Scala function
+\mbox{\tt minTree} that takes a Tree[T], for any ordered T, and 
+returns the minimum value in the tree.  Be sure to use good Scala 
+programming style.
+
+\item 
+\begin{enumerate}
+\item In Scala, write a generic class definition that supports  covariant subtyping
+among instances of the class.  For example, define a generic class C[E] such that
+if class B is a subtype of class A, then C[B] is a subtype of C[A].
+
+
+\item Give an example of the use of your generic class.
+
+
+\end{enumerate} 
+
+\item 
+\begin{enumerate} 
+\item  In Scala, write a generic class definition that supports contravariant subtyping
+among instances of the class.  For example, define a generic class C[E] such that
+if class B is a subtype of class A, then C[A] is a subtype of C[B].
+
+
+\item Give an example of the use of your generic class.
+
+\end{enumerate} 
+\end{enumerate} 
+
+\item 
+\begin{enumerate} 
+\item What is the advantage of a mark-and-sweep garbage collector over a reference counting collector?
+
+\item What is the advantage of a copying garbage collector over a mark and sweep garbage collector?
+
+\item Write a brief description of generational copying garbage collection.
+
+\item Write, in the language of your choice, the procedure {\tt delete(x)} in a reference counting
+GC system, where {\tt x} is a pointer to a structure (e.g. object, struct, etc.) and {\tt delete(x)} 
+reclaims the structure that {\tt x} points to.  Assume that there is a free list of available blocks
+and \mbox{\tt addToFreeList(x)} puts the structure that {\tt x} points to onto the free list.
+
+\end{enumerate} 
+
+\end{enumerate} 
+\end{document}

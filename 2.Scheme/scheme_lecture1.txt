@@ -1,0 +1,97 @@
+Welcome to Racket v7.8.
+R5RS legacy support loaded
+> ; this is a comment
+
+; Basic types: numbers, strings, symbols, booleans (#t and #f)
+
+12
+12
+> 3.5
+3.5
+> "this is a string"
+"this is a string"
+> ;; a symbol is a type whose only property is its name
+'ben
+ben
+> ;;; another basic type, boolean: #f and #t
+(< x 30)
+#t
+
+> ; main aggregate type: list
+'(3 4.5 hello "bye")
+(3 4.5 hello "bye")
+> ;;; Expressions:  start and end with parentheses
+;;  operator or function always comes first (prefix notation)
+(+ 3 4)
+7
+> (+ (* 3 4) 5)
+17
+> ;;; Defining a variable:
+(define x 25)
+> x
+25
+> ;; the quote distinguishes between data (symbol) and an expression.
+x
+25
+> 'x
+x
+> ;; same is true for lists vs. expressions
+(+ 6 7)
+13
+> '(+ 6 7)    ;; this is just a list containg '+, 6, 7
+(+ 6 7)
+> 
+;;; defining a function
+
+(define (f x y z)
+   (* x (+ y z)))
+> (f 5 7 9)
+80
+> ;; conditionals:  if, cond
+
+(if (= x 23) 5 'Nope)
+nope
+> ;;; a COND is like a case statement:
+  ;;; (cond (condition1 result1) (condition2 result2) ... )
+  ;;; returns the first result associated with the first true condition
+
+(cond ((< x 20) 'small)
+      ((< x 30) 'medium)
+      (else 'large))
+medium
+
+> ;;; factorial
+  ;;; base case: n = 0, return 1
+  ;;; recursive assumption:  (factorial (- n 1)) works.
+  ;;; step to implement: (factorial n) => (* n (factorial (- n 1)))
+
+(define (fac n)
+  (if (= n 0) 1
+              (* n (fac (- n 1)))))
+> (fac 4)
+24
+> ;;; revisting lists: how to access elements of a list.
+  ;;; (car L)   returns the first element of the list L
+
+(car '(4 5 6 7))
+4
+> ;;; (cdr L)  returns a list containing the elements of L
+  ;;;          EXCEPT for the first element of L.
+
+(cdr '(4 5 6 7))
+(5 6 7)
+
+> ;; How do I write (nth n L) that returns the n'th element of L?
+
+
+> ;; Base case: (nth n L)  when n = 1, return (car L)
+  ;; Assumption: (nth (- n 1) L)  gives the (n-1)'th element of any list L.
+  ;; Step: (nth n L) => (nth (- n 1) (cdr L))
+
+> (define (nth n L)
+    (cond ((= n 1) (car L))
+          (else (nth (- n 1) (cdr L)))))
+> 
+(nth 3 '(2 4 6 8 10))
+6
+> 
